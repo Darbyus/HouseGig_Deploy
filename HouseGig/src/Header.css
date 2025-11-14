@@ -37,6 +37,18 @@ header.header {
   color: #000 !important;
 }
 
+.header .mantine-TextInput-input {
+  background-color: #fff !important;
+  border-color: #e0e0e0 !important;
+}
+
+.header .mantine-TextInput-input:focus,
+.header .mantine-TextInput-input:focus-within {
+  border-color: #e0e0e0 !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
 .header .mantine-Button-root:hover {
   background-color: transparent !important;
   border-color: #000 !important;

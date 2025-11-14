@@ -3,7 +3,7 @@ import {Group, Button, TextInput, Flex, Box} from '@mantine/core';
 import { IconSearch, IconUser, IconBookmark, IconSettings, IconPlus } from '@tabler/icons-react';
 import { Link, useNavigate } from "react-router-dom";
 import { useRef, useEffect } from "react";
-import logo from '../assets/logo.png';
+import logo from './assets/logo.png';
 
 function Header(){
     const headerRef = useRef(null);
@@ -40,15 +40,7 @@ function Header(){
                         className="header-search"
                     />
                 </Box>
-                <Button
-                    variant="subtle"
-                    size="md"
-                    className="header-btn"
-                    aria-label="Add listing"
-                >
-                    <IconPlus size={22} />
-                </Button>
-                <Group gap="xs">
+                <Group gap={0} style={{ flex: 0.18, justifyContent: 'space-evenly' }}>
                     <Link to="/collections">
                         <Button
                             variant="subtle"
@@ -57,6 +49,16 @@ function Header(){
                             aria-label="Collections"
                         >
                             <IconBookmark size={22} />
+                        </Button>
+                    </Link>
+                    <Link to="/dashboard">
+                        <Button
+                            variant="subtle"
+                            size="md"
+                            className="header-btn"
+                            aria-label="Add listing"
+                        >
+                            <IconPlus size={22} />
                         </Button>
                     </Link>
                     <Link to="/dashboard">
