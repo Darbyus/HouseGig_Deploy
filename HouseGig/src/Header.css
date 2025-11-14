@@ -1,0 +1,34 @@
+/* Header-specific styles */
+header.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  z-index: 1000;
+  background-color: #fff;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  box-shadow: 0 4px 16px 0 rgba(0,0,0,0.13), 0 2px 8px 0 rgba(0,0,0,0.10);
+}
+
+.header .mantine-Button-root {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+}
+
+.header .mantine-Button-section {
+  margin: 0;
+}
+
+/* Add padding to body to prevent content from being hidden under the header */
+body {
+  padding-top: 80px;
+}

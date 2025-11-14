@@ -1,0 +1,15 @@
+/* Footer styles */
+.footer {
+  width: 100vw;
+  background: #fff;
+  color: #888;
+  text-align: center;
+  padding: 1.5rem 0 1rem 0;
+  border-top: 1px solid #e0e0e0;
+  font-size: 1rem;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  z-index: 999;
+  box-shadow: 0 -2px 8px 0 rgba(0,0,0,0.08);
+}

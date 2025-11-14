@@ -1,0 +1,109 @@
+.listing-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px 0 rgba(0,0,0,0.08);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 340px;
+  min-width: 260px;
+  transition: box-shadow 0.2s;
+}
+
+.listing-card:hover {
+  box-shadow: 0 4px 16px 0 rgba(0,0,0,0.13);
+}
+
+.listing-image {
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+}
+
+.listing-info {
+  padding: 1.2rem 1rem 1rem 1rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.listing-title {
+  font-size: 1.18rem;
+  margin: 0 0 0.5rem 0;
+  font-weight: 600;
+}
+
+.listing-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1rem;
+  color: #888;
+  margin-bottom: 0.7rem;
+}
+
+.listing-price {
+  color: #222;
+  font-weight: 500;
+}
+
+.listing-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+
+.listing-owner {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.owner-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #eee;
+}
+
+.owner-username {
+  font-size: 1rem;
+  color: #333;
+  font-weight: 500;
+}
+
+.like-btn {
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  cursor: pointer;
+  padding: 0.2rem 0.5rem;
+  border-radius: 8px;
+  transition: background 0.15s;
+  min-width: 48px;
+  justify-content: flex-end;
+}
+
+.like-btn:hover {
+  background: #ffeaea;
+}
+
+.like-btn.liked svg {
+  fill: #e25555;
+}
+
+.like-btn svg {
+  margin-right: 0.5rem;
+}
+
+.like-count {
+  font-size: 1rem;
+  color: #222;
+  font-weight: 500;
+  margin-left: 0.1rem;
+}
