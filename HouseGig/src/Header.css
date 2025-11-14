@@ -44,8 +44,8 @@ header.header {
 
 .header .mantine-TextInput-input:focus,
 .header .mantine-TextInput-input:focus-within {
-  border-color: #e0e0e0 !important;
-  box-shadow: none !important;
+  border-color: #000 !important;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1) !important;
   outline: none !important;
 }
 
@@ -57,6 +57,25 @@ header.header {
 
 .header .mantine-Button-root:hover svg {
   color: #000 !important;
+}
+
+.profile-btn {
+  background-color: rgba(31, 96, 3, 1) !important;
+  border-color: rgba(31, 96, 3, 1) !important;
+}
+
+.profile-btn svg {
+  color: #fff !important;
+}
+
+.profile-btn:hover {
+  background-color: rgba(31, 96, 3, 1) !important;
+  border-color: #000 !important;
+  outline: 2px solid #000 !important;
+}
+
+.profile-btn:hover svg {
+  color: #fff !important;
 }
 
 /* Add padding to body to prevent content from being hidden under the header */

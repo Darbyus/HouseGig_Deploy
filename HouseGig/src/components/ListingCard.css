@@ -1,18 +1,17 @@
 .listing-card {
   background: #fff;
   border-radius: 16px;
-  box-shadow: 0 2px 8px 0 rgba(0,0,0,0.08);
   overflow: hidden;
   display: flex;
   flex-direction: column;
   width: 100%;
   max-width: 340px;
   min-width: 260px;
-  transition: box-shadow 0.2s;
+  transition: box-shadow 0.3s ease, transform 0.2s ease;
 }
 
 .listing-card:hover {
-  box-shadow: 0 4px 16px 0 rgba(0,0,0,0.13);
+  transform: translateY(-4px);
 }
 
 .listing-image {

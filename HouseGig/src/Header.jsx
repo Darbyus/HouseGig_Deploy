@@ -75,7 +75,7 @@ function Header(){
                         <Button
                             variant="subtle"
                             size="md"
-                            className="header-btn"
+                            className="header-btn profile-btn"
                             aria-label="Profile"
                         >
                             <IconUser size={22} />

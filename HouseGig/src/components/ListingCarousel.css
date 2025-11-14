@@ -1,0 +1,67 @@
+.carousel-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2.5rem;
+}
+
+
+.carousel {
+  display: flex;
+  gap: 2rem;
+  overflow-x: auto;
+  padding: 0.5rem 0;
+  scrollbar-width: thin;
+  scrollbar-color: #1971c2 #e0e0e0;
+  min-width: 0;
+}
+
+.carousel::-webkit-scrollbar {
+  height: 8px;
+}
+.carousel::-webkit-scrollbar-thumb {
+  background: #1971c2;
+  border-radius: 4px;
+}
+
+.carousel-card {
+  min-width: 220px;
+  max-width: 220px;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 2px 12px 0 rgba(0,0,0,0.10);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.2s;
+}
+.carousel-card:hover {
+  transform: translateY(-6px) scale(1.04);
+  box-shadow: 0 6px 24px 0 rgba(25,113,194,0.18);
+}
+.carousel-image {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 14px 14px 0 0;
+}
+.carousel-info {
+  padding: 0.7rem 1rem 1rem 1rem;
+  width: 100%;
+  text-align: left;
+}
+.carousel-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 0.2rem 0;
+}
+.carousel-world {
+  font-size: 0.95rem;
+  color: #1971c2;
+  margin-bottom: 0.2rem;
+}
+.carousel-price {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #222;
+}
