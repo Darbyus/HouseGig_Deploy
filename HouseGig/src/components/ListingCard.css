@@ -1,5 +1,5 @@
 .listing-card {
-  background: #fff;
+  background: var(--card-bg);
   border-radius: 16px;
   overflow: hidden;
   display: flex;
@@ -32,19 +32,19 @@
   font-size: 1.18rem;
   margin: 0 0 5px 0;
   font-weight: 600;
-  color: #222 !important;
+  color: var(--text) !important;
 }
 
 .listing-meta {
   display: flex;
   justify-content: space-between;
   font-size: 1rem;
-  color: #888;
+  color: var(--muted);
   margin-bottom: 5px;
 }
 
 .listing-price {
-  color: #222;
+  color: var(--text);
   font-weight: 500;
 }
 
@@ -66,12 +66,12 @@
   height: 36px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid #eee;
+  border: 2px solid var(--border);
 }
 
 .owner-username {
   font-size: 1rem;
-  color: #333;
+  color: var(--text);
   font-weight: 500;
 }
 
@@ -103,7 +103,7 @@
 
 .like-count {
   font-size: 1rem;
-  color: #222;
+  color: var(--text);
   font-weight: 500;
   margin-left: 0.1rem;
 }

@@ -1,13 +1,24 @@
 @import '@mantine/notifications/styles.css';
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
 
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
+  /* Theme variables (used by components to respond to dark-mode) */
+  --bg: #ffffff;
+  --text: #213547;
+  --surface: #ffffff;
+  --card-bg: #ffffff;
+  --muted: #666666;
+  --border: #e0e0e0;
+  --danger: #e25555;
+  --danger-contrast: #ffb3b3;
+
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color: var(--text);
+  background-color: var(--bg);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -69,8 +80,17 @@ button:focus-visible {
 
 /* Dark Mode Styles */
 body.dark-mode {
-  background-color: #2a2a2a;
-  color: #ffffff;
+  --bg: #2a2a2a;
+  --text: #ffffff;
+  --surface: #2a2a2a;
+  --card-bg: #3a3a3a;
+  --muted: #c0c0c0;
+  --border: #505050;
+  --danger: #ff8a8a;
+  --danger-contrast: #ffb3b3;
+
+  background-color: var(--bg);
+  color: var(--text);
 }
 
 body.dark-mode .header {
@@ -81,7 +101,7 @@ body.dark-mode .header {
 body.dark-mode .header .mantine-TextInput-input {
   background-color: #3a3a3a !important;
   border-color: #505050 !important;
-  color: #ffffff !important;
+  color: var(--text) !important;
 }
 
 body.dark-mode .header .mantine-TextInput-input::placeholder {
@@ -94,9 +114,9 @@ body.dark-mode .header-search svg {
 }
 
 body.dark-mode .mantine-Paper-root {
-  background-color: #3a3a3a;
-  border-color: #505050;
-  color: #ffffff;
+  background-color: var(--card-bg);
+  border-color: var(--border);
+  color: var(--text);
 }
 
 body.dark-mode .mantine-TextInput-input,
@@ -105,25 +125,54 @@ body.dark-mode .mantine-PasswordInput-input,
 body.dark-mode .mantine-Select-input,
 body.dark-mode .mantine-NumberInput-input,
 body.dark-mode .mantine-FileInput-input {
-  background-color: #2a2a2a;
-  border-color: #505050;
-  color: #ffffff;
+  background-color: var(--surface);
+  border-color: var(--border);
+  color: var(--text);
 }
 
 body.dark-mode .mantine-InputWrapper-label,
 body.dark-mode .mantine-Input-label {
-  color: #ffffff;
+  color: var(--text);
+}
+
+/* Error / notification styles */
+body .mantine-Text-root[c="red"],
+body [c="red"],
+.mantine-Text-root[c="red"],
+[c="red"] {
+  color: var(--danger) !important;
+}
+
+body.dark-mode .mantine-Text-root[c="red"],
+body.dark-mode [c="red"] {
+  color: var(--danger-contrast) !important;
+}
+
+body.dark-mode .mantine-Notification-root {
+  background-color: var(--card-bg) !important;
+  color: var(--text) !important;
+  border-color: var(--border) !important;
+}
+
+body.dark-mode .mantine-Notification-title,
+body.dark-mode .mantine-Notification-description,
+body.dark-mode .mantine-Notification-body {
+  color: var(--text) !important;
+}
+
+body.dark-mode .mantine-Notification-root[data-color="red"] .mantine-Notification-icon {
+  background-color: var(--danger) !important;
 }
 
 body.dark-mode .listing-card {
-  background-color: #3a3a3a;
-  border-color: #505050;
-  color: #ffffff;
+  background-color: var(--card-bg);
+  border-color: var(--border);
+  color: var(--text);
 }
 
 body.dark-mode .listing-title,
 body.dark-mode h1, body.dark-mode h2, body.dark-mode h3, body.dark-mode h4, body.dark-mode h5, body.dark-mode h6 {
-  color: #ffffff;
+  color: var(--text);
 }
 
 body.dark-mode .explore-main {
@@ -131,17 +180,17 @@ body.dark-mode .explore-main {
 }
 
 body.dark-mode .listing-details-box {
-  background-color: #3a3a3a;
-  color: #ffffff;
+  background-color: var(--card-bg);
+  color: var(--text);
 }
 
 body.dark-mode .comments-section {
-  background-color: #3a3a3a;
+  background-color: var(--surface);
 }
 
 body.dark-mode .comment-box {
-  background-color: #2a2a2a;
-  border-color: #505050;
+  background-color: var(--surface);
+  border-color: var(--border);
 }
 
 body.dark-mode .mantine-Text-root[c="dimmed"],
@@ -150,15 +199,27 @@ body.dark-mode [class*="dimmed"] {
 }
 
 body.dark-mode .mantine-Menu-dropdown {
-  background-color: #3a3a3a;
-  border-color: #505050;
+  background-color: var(--surface);
+  border-color: var(--border);
 }
 
 body.dark-mode .mantine-Menu-item {
-  color: #ffffff;
+  color: var(--text);
 }
 
 body.dark-mode .mantine-Menu-item:hover {
+  background-color: #505050;
+}
+
+/* Mantine Select dropdowns */
+body.dark-mode .mantine-Select-dropdown,
+body.dark-mode .mantine-Select-item {
+  background-color: var(--surface);
+  color: var(--text);
+  border-color: var(--border);
+}
+
+body.dark-mode .mantine-Select-item:hover {
   background-color: #505050;
 }
 
@@ -167,7 +228,7 @@ body.dark-mode .mantine-Tabs-tab {
 }
 
 body.dark-mode .mantine-Tabs-tab[data-active="true"] {
-  color: #ffffff;
+  color: var(--text);
 }
 
 body.dark-mode p, body.dark-mode span, body.dark-mode div {
@@ -176,7 +237,7 @@ body.dark-mode p, body.dark-mode span, body.dark-mode div {
 
 body.dark-mode .listing-card .listing-title,
 body.dark-mode .listing-card h3 {
-  color: #ffffff !important;
+  color: var(--text) !important;
 }
 
 body.dark-mode .listing-header {
@@ -195,18 +256,18 @@ body.dark-mode .listing-info-item {
 
 body.dark-mode .comment-form,
 body.dark-mode .comment-input {
-  background-color: #3a3a3a;
-  border-color: #505050;
+  background-color: var(--surface);
+  border-color: var(--border);
 }
 
 body.dark-mode .comment-author,
 body.dark-mode .comment-text,
 body.dark-mode .comment-content {
-  color: #ffffff;
+  color: var(--text);
 }
 
 body.dark-mode .comment {
-  background-color: #3a3a3a;
+  background-color: var(--surface);
 }
 
 body.dark-mode .similar-listings-section,
@@ -216,30 +277,30 @@ body.dark-mode .more-listings-section {
 
 body.dark-mode .listing-actions button,
 body.dark-mode .action-button {
-  color: #ffffff;
+  color: var(--text);
 }
 
 body.dark-mode .listing-actions svg,
 body.dark-mode .action-button svg {
-  color: #ffffff !important;
-  stroke: #ffffff !important;
+  color: var(--text) !important;
+  stroke: var(--text) !important;
 }
 
 body.dark-mode .listing-actions span,
 body.dark-mode .action-button span,
 body.dark-mode .action-count {
-  color: #ffffff !important;
+  color: var(--text) !important;
 }
 
 body.dark-mode .mantine-Avatar-root {
-  border-color: #505050;
+  border-color: var(--border);
 }
 
 body.dark-mode .listing-views,
 body.dark-mode .listing-views span {
-  color: #c0c0c0;
+  color: var(--muted);
 }
 
 body.dark-mode .listing-grid-responsive .listing-card {
-  background-color: #3a3a3a;
+  background-color: var(--card-bg);
 }

@@ -5,7 +5,7 @@ header.header {
   left: 0;
   width: 100vw;
   z-index: 1000;
-  background-color: #fff;
+  background-color: var(--card-bg);
   padding: 1rem 1.5rem;
   border-bottom: 1px solid #e0e0e0;
   display: flex;
@@ -30,33 +30,34 @@ header.header {
 }
 
 .header-btn svg {
-  color: #000 !important;
+  color: var(--text) !important;
 }
 
 .header-search svg {
-  color: #000 !important;
+  color: var(--text) !important;
 }
 
 .header .mantine-TextInput-input {
-  background-color: #fff !important;
-  border-color: #e0e0e0 !important;
+  background-color: var(--surface) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
 }
 
 .header .mantine-TextInput-input:focus,
 .header .mantine-TextInput-input:focus-within {
-  border-color: #000 !important;
-  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1) !important;
+  border-color: var(--text) !important;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.06) !important;
   outline: none !important;
 }
 
 .header .mantine-Button-root:hover {
   background-color: transparent !important;
-  border-color: #000 !important;
-  outline: 2px solid #000 !important;
+  border-color: var(--text) !important;
+  outline: 2px solid var(--text) !important;
 }
 
 .header .mantine-Button-root:hover svg {
-  color: #000 !important;
+  color: var(--text) !important;
 }
 
 .profile-btn {
@@ -70,8 +71,8 @@ header.header {
 
 .profile-btn:hover {
   background-color: rgba(31, 96, 3, 1) !important;
-  border-color: #000 !important;
-  outline: 2px solid #000 !important;
+  border-color: var(--text) !important;
+  outline: 2px solid var(--text) !important;
 }
 
 .profile-btn:hover svg {
@@ -81,6 +82,27 @@ header.header {
 /* Ensure dropdown menus appear above header shadow */
 .mantine-Menu-dropdown {
   z-index: 1001 !important;
+}
+
+/* Site initials (used inside ActionIcon for mobile) */
+.site-initials {
+  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  color: rgba(31, 96, 3, 1) !important;
+  background-color: transparent;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.site-initials:hover,
+.site-initials:focus {
+  background-color: rgba(31, 96, 3, 0.08);
+  outline: none;
 }
 
 /* Add padding to body to prevent content from being hidden under the header */

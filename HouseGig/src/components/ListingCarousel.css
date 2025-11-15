@@ -27,7 +27,7 @@
 .carousel-card {
   min-width: 220px;
   max-width: 220px;
-  background: #fff;
+  background: var(--card-bg);
   border-radius: 14px;
   box-shadow: 0 2px 12px 0 rgba(0,0,0,0.10);
   display: flex;
@@ -57,11 +57,11 @@
 }
 .carousel-world {
   font-size: 0.95rem;
-  color: #1971c2;
+  color: var(--text);
   margin-bottom: 0.2rem;
 }
 .carousel-price {
   font-size: 1rem;
   font-weight: 500;
-  color: #222;
+  color: var(--text);
 }

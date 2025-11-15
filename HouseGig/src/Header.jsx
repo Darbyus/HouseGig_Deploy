@@ -57,8 +57,8 @@ function Header(){
                 <Group gap="md">
                     {isMobile ? (
                         <Link to="/" style={{ display: 'flex', alignItems: 'center' }}>
-                            <ActionIcon variant="subtle" size="lg" aria-label="Home">
-                                <IconHome size={24} />
+                            <ActionIcon variant="subtle" size="lg" aria-label="Home" className="site-initials">
+                                <span aria-hidden style={{ fontWeight: 700 }}>HG</span>
                             </ActionIcon>
                         </Link>
                     ) : (
