@@ -330,15 +330,27 @@ function ListingDetails() {
             </div>
             <div className="comments-list">
               {comments.length === 0 ? (
-                <p style={{ textAlign: 'center', color: '#666', padding: '2rem' }}>No comments yet. Be the first to comment!</p>
+                <p style={{ textAlign: 'center', color: '#666', padding: '2rem' }}>
+                  No comments yet. Be the first to comment!
+                </p>
               ) : (
-                comments.map(comment => (
+                comments.map((comment) => (
                   <div key={comment.id} className="comment">
-                    <img src={comment.user.avatar_url} alt={comment.user.username} className="comment-avatar" />
+                    <img 
+                      src={comment.user?.avatar_url || 'https://randomuser.me/api/portraits/men/1.jpg'} 
+                      alt={comment.user?.username || 'User'} 
+                      className="comment-avatar" 
+                    />
                     <div className="comment-content">
                       <div className="comment-header">
-                        <span className="comment-author">{comment.user.username}</span>
-                        <span className="comment-meta">{new Date(comment.created_at).toLocaleDateString()}</span>
+                        <span className="comment-author">{comment.user?.username || 'Anonymous'}</span>
+                        <span className="comment-meta">
+                          {new Date(comment.created_at).toLocaleDateString('en-US', { 
+                            month: 'short', 
+                            day: 'numeric',
+                            year: new Date(comment.created_at).getFullYear() !== new Date().getFullYear() ? 'numeric' : undefined
+                          })}
+                        </span>
                       </div>
                       <div className="comment-text">{comment.content}</div>
                     </div>
