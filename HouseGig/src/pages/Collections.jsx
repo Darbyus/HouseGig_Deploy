@@ -1,11 +1,13 @@
 import './Explore.css';
 import Footer from '../Footer';
+import CollectionCover from '../components/CollectionCover';
 import { useAuth } from '../contexts/AuthContext';
 import { Button, Paper, Text, Title, Modal, TextInput, Textarea, Loader } from '@mantine/core';
 import { IconBookmark, IconPlus } from '@tabler/icons-react';
 import { useState, useEffect } from 'react';
 import { api } from '../services/api';
 import { notifications } from '@mantine/notifications';
+import { Link } from 'react-router-dom';
 
 function Collections() {
   const { user } = useAuth();
@@ -102,12 +104,18 @@ function Collections() {
       ) : (
         <div className="listing-grid-responsive">
           {collections.map(collection => (
-            <Paper key={collection.id} shadow="sm" p="lg" radius="md" withBorder>
-              <IconBookmark size={32} style={{ marginBottom: '0.5rem', color: 'rgba(31, 96, 3, 0.8)' }} />
-              <Title order={4} mb="xs">{collection.name}</Title>
-              <Text c="dimmed" size="sm">{collection.description || 'No description'}</Text>
-              <Text size="sm" mt="md"><strong>{collection.listing_count || 0}</strong> listings</Text>
-            </Paper>
+            <Link key={collection.id} to={`/collection/${collection.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+              <div className="listing-card">
+                <CollectionCover images={collection.cover_images || []} />
+                <div className="listing-info">
+                  <h3 className="listing-title">{collection.name}</h3>
+                  <div className="listing-meta">
+                    <span>{collection.description || 'Collection'}</span>
+                    <span className="listing-price">{collection.listing_count || 0} listings</span>
+                  </div>
+                </div>
+              </div>
+            </Link>
           ))}
         </div>
       )}

@@ -11,6 +11,7 @@ import Explore from "./pages/Explore"
 import Profile from "./pages/Profile";
 import ListingDetails from "./pages/ListingDetails";
 import Collections from "./pages/Collections";
+import Collection from "./pages/Collection";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import Settings from "./pages/Settings";
@@ -27,6 +28,7 @@ function AnimatedRoutes() {
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/profile/:username" element={<Profile />} />
           <Route path="/collections" element={<ProtectedRoute><Collections /></ProtectedRoute>} />
+          <Route path="/collection/:id" element={<ProtectedRoute><Collection /></ProtectedRoute>} />
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
           <Route path="/upload" element={<ProtectedRoute><Upload /></ProtectedRoute>} />

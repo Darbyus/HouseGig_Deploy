@@ -185,6 +185,10 @@ class ApiClient {
     return this.request(`/collections/${id}`);
   }
 
+  async getCollectionsForListing(listingId) {
+    return this.request(`/collections/for-listing/${listingId}`);
+  }
+
   async createCollection(collectionData) {
     return this.request('/collections', {
       method: 'POST',
