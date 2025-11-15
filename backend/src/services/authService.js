@@ -1,56 +1,104 @@
 import jwt from 'jsonwebtoken';
-import bcrypt from 'bcryptjs';
 import { supabase } from '../config/supabaseClient.js';
 
 export const registerService = async (email, password, username) => {
-  // Check if user exists
-  const { data: existingUser } = await supabase
-    .from('users')
+  // Check if username already exists in profiles
+  const { data: existingProfile } = await supabase
+    .from('profiles')
     .select('id')
-    .eq('email', email)
+    .eq('username', username)
     .single();
 
-  if (existingUser) {
-    throw { statusCode: 409, message: 'Email already registered' };
+  if (existingProfile) {
+    throw { statusCode: 409, message: 'Username already taken' };
   }
 
-  // Hash password
-  const hashedPassword = await bcrypt.hash(password, 10);
+  // Create user with Supabase Auth
+  const { data: authData, error: authError } = await supabase.auth.signUp({
+    email,
+    password,
+  });
 
-  // Create user
-  const { data, error } = await supabase
-    .from('users')
-    .insert([{
-      email,
-      username,
-      password_hash: hashedPassword,
-      created_at: new Date()
-    }])
-    .select()
+  if (authError) {
+    throw { statusCode: 400, message: authError.message };
+  }
+
+  // Check if profile already exists (from previous failed attempt)
+  const { data: existingUserProfile } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', authData.user.id)
     .single();
 
-  if (error) throw { statusCode: 400, message: error.message };
+  let profile;
 
-  return generateToken(data);
+  if (existingUserProfile) {
+    // Update existing profile with username
+    const { data: updatedProfile, error: updateError } = await supabase
+      .from('profiles')
+      .update({ username })
+      .eq('id', authData.user.id)
+      .select()
+      .single();
+
+    if (updateError) {
+      throw { statusCode: 400, message: updateError.message };
+    }
+    profile = updatedProfile;
+  } else {
+    // Create new profile
+    const { data: newProfile, error: profileError } = await supabase
+      .from('profiles')
+      .insert([{
+        id: authData.user.id,
+        username,
+        created_at: new Date()
+      }])
+      .select()
+      .single();
+
+    if (profileError) {
+      throw { statusCode: 400, message: profileError.message };
+    }
+    profile = newProfile;
+  }
+
+  return generateToken({
+    id: authData.user.id,
+    email: authData.user.email,
+    username: profile.username
+  });
 };
 
 export const loginService = async (email, password) => {
-  const { data: user, error } = await supabase
-    .from('users')
-    .select('*')
-    .eq('email', email)
+  // Sign in with Supabase Auth
+  const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
+
+  if (authError) {
+    throw { statusCode: 401, message: 'Invalid credentials' };
+  }
+
+  // Get profile info
+  const { data: profile, error: profileError } = await supabase
+    .from('profiles')
+    .select('username, bio, avatar_url')
+    .eq('id', authData.user.id)
     .single();
 
-  if (error || !user) {
-    throw { statusCode: 401, message: 'Invalid credentials' };
+  if (profileError) {
+    throw { statusCode: 404, message: 'Profile not found' };
   }
 
-  const isPasswordValid = await bcrypt.compare(password, user.password_hash);
-  if (!isPasswordValid) {
-    throw { statusCode: 401, message: 'Invalid credentials' };
-  }
-
-  return generateToken(user);
+  return generateToken({
+    id: authData.user.id,
+    email: authData.user.email,
+    username: profile.username,
+    avatar_url: profile.avatar_url,
+    bio: profile.bio
+  });
 };
 
 const generateToken = (user) => {
