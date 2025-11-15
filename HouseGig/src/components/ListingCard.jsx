@@ -60,8 +60,8 @@ function ListingCard({ listing }) {
         </div>
         <div className="listing-footer">
           <div className="listing-owner">
-            <img src={listing.owner.avatar_url} alt={listing.owner.username} className="owner-avatar" />
-            <span className="owner-username">{listing.owner.username}</span>
+            <img src={listing.owner?.avatar_url || 'https://via.placeholder.com/40'} alt={listing.owner?.username || 'User'} className="owner-avatar" />
+            <span className="owner-username">{listing.owner?.username || 'Unknown User'}</span>
           </div>
           <div className="listing-stats" style={{alignItems: 'center', gap: '0.5rem'}}>
             <span className="view-count" style={{color: 'inherit', display: 'inline-flex', alignItems: 'center', minHeight: 0, gap: '0.2rem'}}>

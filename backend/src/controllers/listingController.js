@@ -9,6 +9,19 @@ export const createListing = async (req, res, next) => {
   }
 };
 
+export const uploadImage = async (req, res, next) => {
+  try {
+    console.log('Received file:', req.file);
+    if (!req.file) {
+      return res.status(400).json({ error: 'No image file provided' });
+    }
+    const imageUrl = await listingService.uploadImageService(req.file);
+    res.json({ url: imageUrl });
+  } catch (error) {
+    next(error);
+  }
+}
+
 export const getListing = async (req, res, next) => {
   try {
     const { id } = req.params;

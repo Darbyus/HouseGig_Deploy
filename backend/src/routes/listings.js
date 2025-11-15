@@ -1,17 +1,18 @@
 import express from 'express';
 import * as listingController from '../controllers/listingController.js';
-import { verifyAuth, optionalAuth } from '../middleware/auth.js';
+import { verifyToken, optional } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
 // Public routes
-router.get('/', optionalAuth, listingController.getListings);
-router.get('/:id', optionalAuth, listingController.getListingById);
+router.get('/', optional, listingController.getAllListings);
+router.get('/:id', optional, listingController.getListing);
 
 // Protected routes
-router.post('/', verifyAuth, listingController.createListing);
-router.put('/:id', verifyAuth, listingController.updateListing);
-router.delete('/:id', verifyAuth, listingController.deleteListing);
-router.get('/user/my-listings', verifyAuth, listingController.getUserListings);
+router.post('/', verifyToken, listingController.createListing);
+router.post('/upload-image', verifyToken, listingController.uploadImage);
+router.put('/:id', verifyToken, listingController.updateListing);
+router.delete('/:id', verifyToken, listingController.deleteListing);
+router.get('/user/my-listings', verifyToken, listingController.getUserListings);
 
 export default router;

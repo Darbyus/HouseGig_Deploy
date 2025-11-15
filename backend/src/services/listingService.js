@@ -18,15 +18,30 @@ export const createListingService = async (listingData, userId) => {
 export const getListingService = async (listingId) => {
   const { data, error } = await supabase
     .from('listings')
-    .select(`
-      *,
-      owner:owner_id(id, username, avatar_url, bio),
-      likes(count)
-    `)
+    .select('*')
     .eq('id', listingId)
     .single();
 
-  if (error) throw { statusCode: 404, message: 'Listing not found' };
+  if (error) throw { statusCode: 404, message: error.message || 'Listing not found' };
+  
+  // Fetch owner info from auth.users
+  if (data.owner_id) {
+    try {
+      const { data: { user }, error: userError } = await supabase.auth.admin.getUserById(data.owner_id);
+      if (!userError && user) {
+        data.owner = {
+          id: user.id,
+          username: user.user_metadata?.username || user.email.split('@')[0],
+          avatar_url: user.user_metadata?.avatar_url || null,
+          bio: user.user_metadata?.bio || null
+        };
+      }
+    } catch (e) {
+      // If owner fetch fails, just continue without owner data
+      console.log('Failed to fetch owner:', e);
+    }
+  }
+  
   return data;
 };
 
@@ -55,8 +70,7 @@ export const getAllListingsService = async (filters = {}) => {
       rarity,
       magic_level,
       owner_id,
-      owner:owner_id(username),
-      likes(count)
+      created_at
     `)
     .range(offset, offset + limit - 1);
 
@@ -96,6 +110,28 @@ export const getAllListingsService = async (filters = {}) => {
   const { data, error } = await query;
 
   if (error) throw { statusCode: 400, message: error.message };
+  
+  // Fetch owner info for each listing from auth.users
+  if (data && data.length > 0) {
+    const listingsWithOwners = await Promise.all(data.map(async (listing) => {
+      try {
+        const { data: { user }, error: userError } = await supabase.auth.admin.getUserById(listing.owner_id);
+        if (!userError && user) {
+          listing.owner = {
+            id: user.id,
+            username: user.user_metadata?.username || user.email.split('@')[0],
+            avatar_url: user.user_metadata?.avatar_url || null
+          };
+        }
+      } catch (e) {
+        // If owner fetch fails, continue without owner data
+        console.log('Failed to fetch listing owner:', e);
+      }
+      return listing;
+    }));
+    return listingsWithOwners;
+  }
+  
   return data;
 };
 
@@ -160,3 +196,28 @@ export const getUserListingsService = async (userId, limit = 20, offset = 0) => 
   if (error) throw { statusCode: 400, message: error.message };
   return data;
 };
+
+export const uploadImageService = async (file) => {
+  const fileExt = file.originalname.split('.').pop();
+  const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+  const filePath = `${fileName}`;
+
+  const { data, error } = await supabase
+    .storage
+    .from('ImgB')
+    .upload(filePath, file.buffer, {
+      contentType: file.mimetype,
+      upsert: false
+    });
+
+  if (error) {
+    throw { statusCode: 500, message: `Image upload failed: ${error.message}` };
+  }
+
+  const { data: { publicUrl } } = supabase
+    .storage
+    .from('ImgB')
+    .getPublicUrl(filePath);
+
+  return publicUrl;
+}

@@ -61,7 +61,7 @@ export const checkIfUserLiked = async (listingId, userId) => {
 export const getUserLikedListings = async (userId, limit = 20, offset = 0) => {
   const { data, error } = await supabase
     .from('likes')
-    .select('listing:listing_id(*)')
+    .select('listing:listings!listing_id(*)')
     .eq('user_id', userId)
     .order('created_at', { ascending: false })
     .range(offset, offset + limit - 1);

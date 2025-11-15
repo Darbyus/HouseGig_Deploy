@@ -35,12 +35,16 @@ class ApiClient {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Request failed');
+        throw new Error(data.error || data.message || 'Request failed');
       }
 
       return data;
     } catch (error) {
       console.error('API Error:', error);
+      // If it's a network error or parsing error, provide better message
+      if (error.message === 'Failed to fetch') {
+        throw new Error('Cannot connect to server. Please ensure the backend is running.');
+      }
       throw error;
     }
   }
@@ -116,6 +120,49 @@ class ApiClient {
       body: JSON.stringify({ listingId }),
     });
   }
+
+  async uploadImage(file) {
+    const formData = new FormData();
+    formData.append('image', file);
+
+    const headers = {};
+    if (this.token) {
+      headers['Authorization'] = `Bearer ${this.token}`;
+    }
+    // Don't set Content-Type - let browser set it with boundary
+
+    try {
+      const response = await fetch(`${this.baseURL}/listings/upload-image`, {
+        method: 'POST',
+        headers,
+        body: formData,
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || data.message || 'Upload failed');
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Upload Error:', error);
+      throw error;
+    }
+  }
+
+  async uploadImages(files) {
+    const uploadedUrls = [];
+    const allPromises = [];
+    for (const file of files) {
+      allPromises.push(this.uploadImage(file));
+    }
+    const results = await Promise.all(allPromises);
+    for (const result of results) {
+      uploadedUrls.push(result.url);
+    }
+    return uploadedUrls;
+  }
+
 
   async getLikesCount(listingId) {
     return this.request(`/likes/${listingId}/count`);

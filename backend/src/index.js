@@ -2,6 +2,8 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
+import authRouter from './routes/authRoutes.js';
+import userRouter from './routes/userRoutes.js';
 import listingsRouter from './routes/listings.js';
 import collectionsRouter from './routes/collections.js';
 import likesRouter from './routes/likes.js';
@@ -23,6 +25,8 @@ app.get('/health', (req, res) => {
 });
 
 // Routes
+app.use('/api/auth', authRouter);
+app.use('/api/users', userRouter);
 app.use('/api/listings', listingsRouter);
 app.use('/api/collections', collectionsRouter);
 app.use('/api/likes', likesRouter);

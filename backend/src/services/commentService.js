@@ -19,15 +19,33 @@ export const createCommentService = async (listingId, userId, content) => {
 export const getListingCommentsService = async (listingId, limit = 20, offset = 0) => {
   const { data, error } = await supabase
     .from('comments')
-    .select(`
-      *,
-      user:user_id(id, username, avatar_url)
-    `)
+    .select('*')
     .eq('listing_id', listingId)
     .order('created_at', { ascending: false })
     .range(offset, offset + limit - 1);
 
   if (error) throw { statusCode: 400, message: error.message };
+  
+  // Fetch user info for each comment from auth.users
+  if (data && data.length > 0) {
+    const commentsWithUsers = await Promise.all(data.map(async (comment) => {
+      try {
+        const { data: { user }, error: userError } = await supabase.auth.admin.getUserById(comment.user_id);
+        if (!userError && user) {
+          comment.user = {
+            id: user.id,
+            username: user.user_metadata?.username || user.email.split('@')[0],
+            avatar_url: user.user_metadata?.avatar_url || null
+          };
+        }
+      } catch (e) {
+        console.log('Failed to fetch comment user:', e);
+      }
+      return comment;
+    }));
+    return commentsWithUsers;
+  }
+  
   return data;
 };
 

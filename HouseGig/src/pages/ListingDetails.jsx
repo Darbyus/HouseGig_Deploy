@@ -6,13 +6,17 @@ import Footer from '../Footer';
 import { useParams, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import listings from '../dummyListings';
-import { Container } from '@mantine/core';
+import { Container, Loader } from '@mantine/core';
+import { api } from '../services/api';
+import { notifications } from '@mantine/notifications';
 
 function ListingDetails() {
   const { id } = useParams();
-  const listing = listings.find(l => String(l.id) === String(id));
   const { isAuthenticated, requireAuth } = useAuth();
 
+  const [listing, setListing] = React.useState(null);
+  const [loading, setLoading] = React.useState(true);
+  const [comments, setComments] = React.useState([]);
   const [slideshowOpen, setSlideshowOpen] = React.useState(false);
   const [slideshowIndex, setSlideshowIndex] = React.useState(0);
   const [commentText, setCommentText] = React.useState('');
@@ -22,17 +26,46 @@ function ListingDetails() {
   const [guestAction, setGuestAction] = React.useState('');
   const textareaRef = React.useRef(null);
 
-  // Reset state when listing ID changes
+  // Fetch listing data
   React.useEffect(() => {
-    setSlideshowOpen(false);
-    setSlideshowIndex(0);
-    setCommentText('');
-    setLiked(false);
-    setSaved(false);
-    setGuestPromptOpen(false);
-    setGuestAction('');
+    const fetchListing = async () => {
+      try {
+        setLoading(true);
+        const data = await api.getListing(id);
+        setListing(data);
+        
+        // Fetch comments
+        const commentsData = await api.getComments(id);
+        setComments(commentsData);
+        
+        // Check if liked
+        if (isAuthenticated) {
+          const likedStatus = await api.checkIfLiked(id);
+          setLiked(likedStatus.isLiked);
+        }
+      } catch (error) {
+        console.error('Error fetching listing:', error);
+        notifications.show({
+          title: 'Error',
+          message: 'Failed to load listing',
+          color: 'red',
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchListing();
     window.scrollTo(0, 0);
-  }, [id]);
+  }, [id, isAuthenticated]);
+
+  if (loading) {
+    return (
+      <main className="explore-main" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
+        <Loader size="lg" />
+      </main>
+    );
+  }
 
   if (!listing) {
     return (
@@ -43,31 +76,69 @@ function ListingDetails() {
     );
   }
 
-  // For demo: use main_image_url as first, and fill up to 9 with same image (simulate multiple images)
+  // Collect all available images
   const images = [listing.main_image_url];
-  while (images.length < 9) images.push(listing.main_image_url);
+  if (listing.gallery_image_urls && listing.gallery_image_urls.length > 0) {
+    images.push(...listing.gallery_image_urls);
+  }
+  
+  // Get grid class based on number of images
+  const getGalleryGridClass = () => {
+    const galleryCount = images.length - 1; // Minus 1 for main image
+    if (galleryCount === 0) return 'listing-gallery-grid-empty';
+    if (galleryCount === 1) return 'listing-gallery-grid-single';
+    if (galleryCount === 2) return 'listing-gallery-grid-double';
+    if (galleryCount === 3) return 'listing-gallery-grid-triple';
+    return 'listing-gallery-grid'; // 4+ images
+  };
 
   const openSlideshow = idx => {
     setSlideshowIndex(idx);
     setSlideshowOpen(true);
   };
 
-  const handleLike = () => {
+  const handleLike = async () => {
     if (!requireAuth(() => {
       setGuestAction('like this listing');
       setGuestPromptOpen(true);
     })) return;
-    setLiked(!liked);
-    // TODO: Call api.likeListing() or api.unlikeListing()
+    
+    try {
+      if (liked) {
+        await api.unlikeListing(id);
+        setLiked(false);
+        notifications.show({
+          message: 'Removed from likes',
+          color: 'gray',
+        });
+      } else {
+        await api.likeListing(id);
+        setLiked(true);
+        notifications.show({
+          message: 'Added to likes',
+          color: 'green',
+        });
+      }
+    } catch (error) {
+      notifications.show({
+        title: 'Error',
+        message: 'Failed to update like status',
+        color: 'red',
+      });
+    }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!requireAuth(() => {
       setGuestAction('save this listing');
       setGuestPromptOpen(true);
     })) return;
+    
     setSaved(!saved);
-    // TODO: Add to collection via API
+    notifications.show({
+      message: saved ? 'Removed from collection' : 'Saved to collection',
+      color: saved ? 'gray' : 'green',
+    });
   };
 
   const handleShare = () => {
@@ -76,18 +147,30 @@ function ListingDetails() {
     alert('Link copied to clipboard!');
   };
 
-  const handleCommentSubmit = () => {
+  const handleCommentSubmit = async () => {
     if (!requireAuth(() => {
       setGuestAction('post a comment');
       setGuestPromptOpen(true);
     })) return;
     
     if (commentText.trim()) {
-      console.log('Send comment:', commentText);
-      // TODO: Call api.createComment(listing.id, commentText)
-      setCommentText('');
-      if (textareaRef.current) {
-        textareaRef.current.style.height = 'auto';
+      try {
+        const newComment = await api.createComment(id, commentText);
+        setComments([...comments, newComment]);
+        setCommentText('');
+        if (textareaRef.current) {
+          textareaRef.current.style.height = 'auto';
+        }
+        notifications.show({
+          message: 'Comment posted successfully',
+          color: 'green',
+        });
+      } catch (error) {
+        notifications.show({
+          title: 'Error',
+          message: 'Failed to post comment',
+          color: 'red',
+        });
       }
     }
   };
@@ -104,34 +187,36 @@ function ListingDetails() {
               tabIndex={0}
               onClick={() => openSlideshow(0)}
             />
-            <div className="listing-gallery-grid">
-              {images.slice(1, 4).map((img, idx) => (
-                <img
-                  key={idx}
-                  src={img}
-                  alt={`Gallery ${idx + 1}`}
-                  className="listing-gallery-thumb"
-                  tabIndex={0}
-                  onClick={() => openSlideshow(idx + 1)}
-                />
-              ))}
-              {images.length > 4 && (
-                <div 
-                  className="listing-gallery-thumb gallery-more"
-                  tabIndex={0}
-                  onClick={() => openSlideshow(4)}
-                >
+            {images.length > 1 && (
+              <div className={getGalleryGridClass()}>
+                {images.slice(1, 5).map((img, idx) => (
                   <img
-                    src={images[4]}
-                    alt="Gallery 4"
-                    className="gallery-more-bg"
+                    key={idx}
+                    src={img}
+                    alt={`Gallery ${idx + 1}`}
+                    className="listing-gallery-thumb"
+                    tabIndex={0}
+                    onClick={() => openSlideshow(idx + 1)}
                   />
-                  <div className="gallery-more-overlay">
-                    +{images.length - 4}
+                ))}
+                {images.length > 5 && (
+                  <div 
+                    className="listing-gallery-thumb gallery-more"
+                    tabIndex={0}
+                    onClick={() => openSlideshow(5)}
+                  >
+                    <img
+                      src={images[5]}
+                      alt="Gallery 5"
+                      className="gallery-more-bg"
+                    />
+                    <div className="gallery-more-overlay">
+                      +{images.length - 5}
+                    </div>
                   </div>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            )}
           </div>
         </Container>
         

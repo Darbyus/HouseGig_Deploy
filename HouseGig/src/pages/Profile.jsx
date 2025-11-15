@@ -2,22 +2,70 @@ import './Explore.css';
 import Footer from '../Footer';
 import { useAuth } from '../contexts/AuthContext';
 import { useParams } from 'react-router-dom';
-import { Paper, Text, Title, Avatar, Button, Tabs } from '@mantine/core';
+import { Paper, Text, Title, Avatar, Button, Tabs, Loader } from '@mantine/core';
 import { IconSettings } from '@tabler/icons-react';
 import ListingCard from '../components/ListingCard';
 import { Link } from 'react-router-dom';
-import listings from '../dummyListings';
+import { api } from '../services/api';
+import { useState, useEffect } from 'react';
+import { notifications } from '@mantine/notifications';
 
 function Profile() {
   const { user, isAuthenticated } = useAuth();
   const { userId } = useParams();
   const isOwnProfile = !userId || (isAuthenticated && user?.id === userId);
 
-  // TODO: Fetch user data from API if viewing another user's profile
-  const profileUser = isOwnProfile ? user : { username: 'OtherUser', avatar_url: 'https://randomuser.me/api/portraits/men/1.jpg' };
-  
-  // TODO: Fetch user's listings from API
-  const userListings = listings.slice(0, 4);
+  const [profileUser, setProfileUser] = useState(user);
+  const [userListings, setUserListings] = useState([]);
+  const [likedListings, setLikedListings] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      try {
+        setLoading(true);
+        
+        // Fetch user profile if viewing another user
+        if (!isOwnProfile && userId) {
+          const userData = await api.getUserProfile(userId);
+          setProfileUser(userData);
+        } else {
+          setProfileUser(user);
+        }
+
+        // Fetch user's listings
+        if (isOwnProfile) {
+          const listings = await api.getMyListings();
+          setUserListings(listings);
+          
+          // Fetch liked listings
+          const liked = await api.getMyLikedListings();
+          setLikedListings(liked);
+        }
+      } catch (error) {
+        console.error('Error fetching profile:', error);
+        notifications.show({
+          title: 'Error',
+          message: 'Failed to load profile data',
+          color: 'red',
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (user || userId) {
+      fetchProfileData();
+    }
+  }, [userId, isOwnProfile, user]);
+
+  if (loading) {
+    return (
+      <main className="explore-main" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
+        <Loader size="lg" />
+      </main>
+    );
+  }
 
   return (
     <main className="explore-main">
@@ -76,9 +124,19 @@ function Profile() {
 
         {isOwnProfile && (
           <Tabs.Panel value="liked" pt="xl">
-            <Paper shadow="sm" p="xl" radius="md" withBorder style={{ textAlign: 'center' }}>
-              <Text c="dimmed">No liked listings yet</Text>
-            </Paper>
+            {likedListings.length === 0 ? (
+              <Paper shadow="sm" p="xl" radius="md" withBorder style={{ textAlign: 'center' }}>
+                <Text c="dimmed">No liked listings yet</Text>
+              </Paper>
+            ) : (
+              <div className="listing-grid-responsive">
+                {likedListings.map(listing => (
+                  <Link key={listing.id} to={`/listing/${listing.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                    <ListingCard listing={listing} />
+                  </Link>
+                ))}
+              </div>
+            )}
           </Tabs.Panel>
         )}
       </Tabs>
