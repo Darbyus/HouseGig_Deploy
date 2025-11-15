@@ -28,6 +28,16 @@ export const getUserCollections = async (req, res, next) => {
   }
 };
 
+export const getUserCollectionsForListing = async (req, res, next) => {
+  try {
+    const { listingId } = req.params;
+    const collections = await collectionService.getUserCollectionsForListingService(req.user.id, listingId);
+    res.json(collections);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const updateCollection = async (req, res, next) => {
   try {
     const { id } = req.params;

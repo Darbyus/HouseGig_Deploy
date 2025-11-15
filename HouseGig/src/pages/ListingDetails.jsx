@@ -5,7 +5,7 @@ import GuestPrompt from '../components/GuestPrompt';
 import Footer from '../Footer';
 import { useParams, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Container, Loader } from '@mantine/core';
+import { Container, Loader, Modal, Checkbox, Button } from '@mantine/core';
 import { api } from '../services/api';
 import { notifications } from '@mantine/notifications';
 
@@ -24,6 +24,9 @@ function ListingDetails() {
   const [saved, setSaved] = React.useState(false);
   const [guestPromptOpen, setGuestPromptOpen] = React.useState(false);
   const [guestAction, setGuestAction] = React.useState('');
+  const [collectionsModalOpen, setCollectionsModalOpen] = React.useState(false);
+  const [collections, setCollections] = React.useState([]);
+  const [selectedCollections, setSelectedCollections] = React.useState(new Set());
   const textareaRef = React.useRef(null);
 
   // Fetch listing data
@@ -140,12 +143,17 @@ function ListingDetails() {
       setGuestAction('save this listing');
       setGuestPromptOpen(true);
     })) return;
-    
-    setSaved(!saved);
-    notifications.show({
-      message: saved ? 'Removed from collection' : 'Saved to collection',
-      color: saved ? 'gray' : 'green',
-    });
+    try {
+      // Open modal with user's collections and membership state
+      const data = await api.getCollectionsForListing(id);
+      setCollections(data);
+      const initial = new Set(data.filter(c => c.has_listing).map(c => c.id));
+      setSelectedCollections(initial);
+      setSaved(initial.size > 0);
+      setCollectionsModalOpen(true);
+    } catch (e) {
+      notifications.show({ title: 'Error', message: 'Failed to load collections', color: 'red' });
+    }
   };
 
   const handleShare = () => {
@@ -280,6 +288,9 @@ function ListingDetails() {
                   <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
                 </svg>
               </button>
+              {saved && (
+                <span style={{ marginLeft: '8px', fontSize: '0.9rem', color: '#1971c2' }}>Saved</span>
+              )}
               <button className="action-btn-with-count" onClick={handleShare}>
                 <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="18" cy="5" r="3"></circle>
@@ -402,6 +413,58 @@ function ListingDetails() {
         </div>
 
         <Footer />
+        <Modal opened={collectionsModalOpen} onClose={() => setCollectionsModalOpen(false)} title="Save to collections">
+          {collections.length === 0 ? (
+            <p style={{ color: '#666' }}>You have no collections yet.</p>
+          ) : (
+            <div style={{ display: 'grid', gap: '0.6rem' }}>
+              {collections.map((c) => (
+                <div key={c.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <Checkbox
+                    label={c.name}
+                    checked={selectedCollections.has(c.id)}
+                    onChange={(e) => {
+                      const checked = e.currentTarget.checked;
+                      setSelectedCollections(prev => {
+                        const next = new Set(prev);
+                        if (checked) next.add(c.id); else next.delete(c.id);
+                        return next;
+                      });
+                    }}
+                  />
+                </div>
+              ))}
+              <Button
+                style={{ marginTop: '0.8rem', backgroundColor: 'rgba(31, 96, 3, 0.8)' }}
+                onClick={async () => {
+                  // Apply diff
+                  const current = new Set(collections.filter(c => c.has_listing).map(c => c.id));
+                  const desired = selectedCollections;
+                  const toAdd = [...desired].filter(id2 => !current.has(id2));
+                  const toRemove = [...current].filter(id2 => !desired.has(id2));
+                  try {
+                    // Execute sequentially to keep it simple
+                    for (const cid of toAdd) {
+                      await api.addListingToCollection(cid, id);
+                    }
+                    for (const cid of toRemove) {
+                      await api.removeListingFromCollection(cid, id);
+                    }
+                    // Update local states
+                    setCollections(prev => prev.map(c => ({ ...c, has_listing: desired.has(c.id) })));
+                    setSaved(desired.size > 0);
+                    notifications.show({ message: 'Collections updated', color: 'green' });
+                    setCollectionsModalOpen(false);
+                  } catch (err) {
+                    notifications.show({ title: 'Error', message: 'Failed to update collections', color: 'red' });
+                  }
+                }}
+              >
+                Confirm
+              </Button>
+            </div>
+          )}
+        </Modal>
         {slideshowOpen && (
           <ImageSlideshow
             images={images}

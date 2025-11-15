@@ -6,6 +6,9 @@ const router = express.Router();
 
 router.post('/', authenticate, collectionController.createCollection);
 router.get('/', authenticate, collectionController.getUserCollections);
+// Return all of the current user's collections with a boolean indicating
+// whether a given listing is in each collection
+router.get('/for-listing/:listingId', authenticate, collectionController.getUserCollectionsForListing);
 router.get('/:id', collectionController.getCollection);
 router.put('/:id', authenticate, collectionController.updateCollection);
 router.delete('/:id', authenticate, collectionController.deleteCollection);
