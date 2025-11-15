@@ -2,9 +2,9 @@ import '@mantine/core/styles.css';
 import { MantineProvider } from '@mantine/core';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import ProtectedRoute from './components/ProtectedRoute';
-import { AnimatePresence, motion } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import Header from "./Header"
 // import Footer from "./Footer"
 import Explore from "./pages/Explore"
@@ -25,7 +25,7 @@ function AnimatedRoutes() {
           <Route path="/listing/:id" element={<ListingDetails />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-          <Route path="/profile/:userId" element={<Profile />} />
+          <Route path="/profile/:username" element={<Profile />} />
           <Route path="/collections" element={<ProtectedRoute><Collections /></ProtectedRoute>} />
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
@@ -37,9 +37,10 @@ function AnimatedRoutes() {
 function App() {
   return (
     <MantineProvider>
-      <AuthProvider>
-        <Router>
-          <Header />
+      <ThemeProvider>
+        <AuthProvider>
+          <Router>
+            <Header />
           <div style={{
             display: 'flex',
             justifyContent: 'center',
@@ -54,8 +55,9 @@ function App() {
             </div>
           </div>
           {/* Footer is now handled per-page, not globally */}
-        </Router>
-      </AuthProvider>
+          </Router>
+        </AuthProvider>
+      </ThemeProvider>
     </MantineProvider>
   );
 }

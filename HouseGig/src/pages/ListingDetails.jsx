@@ -255,7 +255,7 @@ function ListingDetails() {
           </div>
 
           <div className="listing-actions-row">
-            <Link to={`/profile/${listing.owner.id}`} className="listing-user-info">
+            <Link to={`/profile/${listing.owner.username}`} className="listing-user-info">
               <img src={listing.owner.avatar_url} alt={listing.owner.username} className="listing-user-avatar" />
               <span className="listing-user-name">{listing.owner.username}</span>
             </Link>
@@ -336,11 +336,20 @@ function ListingDetails() {
               ) : (
                 comments.map((comment) => (
                   <div key={comment.id} className="comment">
-                    <img 
-                      src={comment.user?.avatar_url || 'https://randomuser.me/api/portraits/men/1.jpg'} 
-                      alt={comment.user?.username || 'User'} 
-                      className="comment-avatar" 
-                    />
+                    {comment.user?.avatar_url ? (
+                      <img 
+                        src={comment.user.avatar_url} 
+                        alt={comment.user.username} 
+                        className="comment-avatar" 
+                      />
+                    ) : (
+                      <div className="comment-avatar-placeholder">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                          <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                      </div>
+                    )}
                     <div className="comment-content">
                       <div className="comment-header">
                         <span className="comment-author">{comment.user?.username || 'Anonymous'}</span>
@@ -353,6 +362,44 @@ function ListingDetails() {
                         </span>
                       </div>
                       <div className="comment-text">{comment.content}</div>
+                      <div className="comment-actions">
+                        <button 
+                          className="comment-action-btn"
+                          onClick={async () => {
+                            if (!requireAuth(() => {
+                              setGuestAction('like this comment');
+                              setGuestPromptOpen(true);
+                            })) return;
+                            
+                            try {
+                              await api.likeComment(comment.id);
+                              // Refresh comments
+                              const updatedComments = await api.getComments(id);
+                              setComments(updatedComments);
+                            } catch (error) {
+                              console.error('Failed to like comment:', error);
+                            }
+                          }}
+                        >
+                          <svg width="14" height="14" viewBox="2 0 20 16" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M12 15C12 15 5 10.36 5 6.5C5 4.02 7.02 2 9.5 2C10.88 2 12.13 2.81 13 4.08C13.87 2.81 15.12 2 16.5 2C18.98 2 21 4.02 21 6.5C21 10.36 14 15 14 15H12Z" />
+                          </svg>
+                          {comment.likes_count || 0}
+                        </button>
+                        <button 
+                          className="comment-action-btn"
+                          onClick={() => {
+                            if (!requireAuth(() => {
+                              setGuestAction('reply to this comment');
+                              setGuestPromptOpen(true);
+                            })) return;
+                            // TODO: Add reply input UI
+                            console.log('Reply to comment:', comment.id);
+                          }}
+                        >
+                          Reply
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))

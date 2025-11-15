@@ -343,6 +343,29 @@
   object-fit: cover;
 }
 
+.comment-avatar-placeholder {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: #e9ecef;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.comment-avatar-placeholder svg {
+  color: #868e96;
+}
+
+body.dark-mode .comment-avatar-placeholder {
+  background-color: #2c2e33;
+}
+
+body.dark-mode .comment-avatar-placeholder svg {
+  color: #909296;
+}
+
 .comment-content {
   flex: 1;
 }
@@ -431,6 +454,13 @@
 .similar-listing-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+  color: inherit !important;
+}
+
+.similar-listing-card:hover .similar-listing-title,
+.similar-listing-card:hover .similar-listing-price,
+.similar-listing-card:hover .similar-listing-owner {
+  color: inherit !important;
 }
 
 .similar-listing-image {

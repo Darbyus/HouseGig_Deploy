@@ -12,8 +12,8 @@ import { notifications } from '@mantine/notifications';
 
 function Profile() {
   const { user, isAuthenticated } = useAuth();
-  const { userId } = useParams();
-  const isOwnProfile = !userId || (isAuthenticated && user?.id === userId);
+  const { username } = useParams();
+  const isOwnProfile = !username || (isAuthenticated && user?.username === username);
 
   const [profileUser, setProfileUser] = useState(user);
   const [userListings, setUserListings] = useState([]);
@@ -26,8 +26,8 @@ function Profile() {
         setLoading(true);
         
         // Fetch user profile if viewing another user
-        if (!isOwnProfile && userId) {
-          const userData = await api.getUserProfile(userId);
+        if (!isOwnProfile && username) {
+          const userData = await api.getUserProfile(username);
           setProfileUser(userData);
         } else {
           setProfileUser(user);
@@ -54,10 +54,10 @@ function Profile() {
       }
     };
 
-    if (user || userId) {
+    if (user || username) {
       fetchProfileData();
     }
-  }, [userId, isOwnProfile, user]);
+  }, [username, isOwnProfile, user]);
 
   if (loading) {
     return (
@@ -81,8 +81,6 @@ function Profile() {
             <Text c="dimmed" size="sm">{profileUser?.bio || 'No bio available'}</Text>
             <div style={{ display: 'flex', gap: '2rem', marginTop: '0.5rem' }}>
               <Text size="sm"><strong>{userListings.length}</strong> Listings</Text>
-              <Text size="sm"><strong>0</strong> Collections</Text>
-              <Text size="sm"><strong>0</strong> Followers</Text>
             </div>
           </div>
           {isOwnProfile && (

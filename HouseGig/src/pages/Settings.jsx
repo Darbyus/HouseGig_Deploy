@@ -1,39 +1,67 @@
 import './Explore.css';
 import Footer from '../Footer';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { Paper, Title, TextInput, Textarea, Button, PasswordInput, Avatar, FileInput, Group, Divider, Text, Select, Switch } from '@mantine/core';
 import { IconUser, IconLock, IconUpload, IconCheck, IconX, IconPalette } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
+import { api } from '../services/api';
 
 function Settings() {
   const { user } = useAuth();
+  const { darkMode, setDarkMode } = useTheme();
   const [loading, setLoading] = useState(false);
+  const [uploadingPicture, setUploadingPicture] = useState(false);
   const [profileData, setProfileData] = useState({
     username: user?.username || '',
     email: user?.email || '',
     bio: user?.bio || '',
-    avatar: null
   });
+  const [profilePicture, setProfilePicture] = useState(null);
+  const [currentAvatarUrl, setCurrentAvatarUrl] = useState(user?.avatar_url || null);
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
     newPassword: '',
     confirmPassword: ''
   });
   const [language, setLanguage] = useState('en');
-  const [darkMode, setDarkMode] = useState(() => {
-    return localStorage.getItem('darkMode') === 'true';
-  });
 
-  useEffect(() => {
-    // Apply dark mode class to body
-    if (darkMode) {
-      document.body.classList.add('dark-mode');
-    } else {
-      document.body.classList.remove('dark-mode');
+  const handleProfilePictureUpload = async () => {
+    if (!profilePicture) {
+      notifications.show({
+        title: 'No File Selected',
+        message: 'Please select a profile picture to upload',
+        color: 'orange',
+        icon: <IconX size={18} />
+      });
+      return;
     }
-    localStorage.setItem('darkMode', darkMode);
-  }, [darkMode]);
+
+    setUploadingPicture(true);
+    
+    try {
+      const result = await api.uploadProfilePicture(profilePicture);
+      setCurrentAvatarUrl(result.imageUrl);
+      setProfilePicture(null);
+      
+      notifications.show({
+        title: 'Success',
+        message: 'Profile picture updated successfully',
+        color: 'green',
+        icon: <IconCheck size={18} />
+      });
+    } catch (err) {
+      notifications.show({
+        title: 'Upload Failed',
+        message: err.message || 'Failed to upload profile picture',
+        color: 'red',
+        icon: <IconX size={18} />
+      });
+    } finally {
+      setUploadingPicture(false);
+    }
+  };
 
   const handleProfileUpdate = async (e) => {
     e.preventDefault();
@@ -52,10 +80,10 @@ function Settings() {
         color: 'green',
         icon: <IconCheck size={18} />
       });
-    } catch (error) {
+    } catch (err) {
       notifications.show({
         title: 'Error',
-        message: 'Failed to update profile',
+        message: err.message || 'Failed to update profile',
         color: 'red',
         icon: <IconX size={18} />
       });
@@ -104,10 +132,10 @@ function Settings() {
       });
       
       setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
-    } catch (error) {
+    } catch (err) {
       notifications.show({
         title: 'Error',
-        message: 'Failed to update password',
+        message: err.message || 'Failed to update password',
         color: 'red',
         icon: <IconX size={18} />
       });
@@ -127,19 +155,33 @@ function Settings() {
         </Title>
         
         <form onSubmit={handleProfileUpdate}>
-          <Group mb="md">
+          <Group mb="md" align="flex-start">
             <Avatar 
-              src={user?.avatar_url} 
+              src={currentAvatarUrl || user?.avatar_url} 
               size={80} 
               radius="md"
             />
-            <FileInput
-              placeholder="Upload new avatar"
-              accept="image/*"
-              leftSection={<IconUpload size={18} />}
-              onChange={(file) => setProfileData({ ...profileData, avatar: file })}
-              style={{ flex: 1 }}
-            />
+            <div style={{ flex: 1 }}>
+              <FileInput
+                placeholder="Choose profile picture"
+                accept="image/*"
+                leftSection={<IconUpload size={18} />}
+                value={profilePicture}
+                onChange={setProfilePicture}
+                mb="xs"
+              />
+              <Button 
+                onClick={handleProfilePictureUpload}
+                loading={uploadingPicture}
+                disabled={!profilePicture}
+                size="sm"
+                variant="light"
+                leftSection={<IconUpload size={16} />}
+                style={{ backgroundColor: 'rgba(31, 96, 3, 0.1)' }}
+              >
+                Upload Profile Picture
+              </Button>
+            </div>
           </Group>
 
           <TextInput

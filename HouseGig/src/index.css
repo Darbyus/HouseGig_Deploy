@@ -198,6 +198,15 @@ body.dark-mode [class*="dimmed"] {
   color: #c0c0c0 !important;
 }
 
+/* Loader color override to green */
+.mantine-Loader-root {
+  color: rgba(31, 96, 3, 1) !important;
+}
+
+body.dark-mode .mantine-Loader-root {
+  color: rgba(31, 96, 3, 1) !important;
+}
+
 body.dark-mode .mantine-Menu-dropdown {
   background-color: var(--surface);
   border-color: var(--border);

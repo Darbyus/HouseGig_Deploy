@@ -244,6 +244,33 @@ class ApiClient {
     });
   }
 
+  async likeComment(commentId) {
+    return this.request(`/comments/${commentId}/like`, {
+      method: 'POST',
+    });
+  }
+
+  async unlikeComment(commentId) {
+    return this.request(`/comments/${commentId}/like`, {
+      method: 'DELETE',
+    });
+  }
+
+  async checkCommentLiked(commentId) {
+    return this.request(`/comments/${commentId}/liked`);
+  }
+
+  async createReply(commentId, content) {
+    return this.request(`/comments/${commentId}/reply`, {
+      method: 'POST',
+      body: JSON.stringify({ content }),
+    });
+  }
+
+  async getCommentReplies(commentId) {
+    return this.request(`/comments/${commentId}/replies`);
+  }
+
   // Users
   async getMe() {
     return this.request('/users/me');
@@ -258,6 +285,34 @@ class ApiClient {
       method: 'PUT',
       body: JSON.stringify(profileData),
     });
+  }
+
+  async uploadProfilePicture(file) {
+    const formData = new FormData();
+    formData.append('image', file);
+
+    const headers = {};
+    if (this.token) {
+      headers['Authorization'] = `Bearer ${this.token}`;
+    }
+
+    try {
+      const response = await fetch(`${this.baseURL}/users/upload-profile-picture`, {
+        method: 'POST',
+        headers,
+        body: formData,
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || data.message || 'Upload failed');
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Profile picture upload error:', error);
+      throw error;
+    }
   }
 }
 
